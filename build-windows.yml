@@ -1,40 +1,52 @@
 name: Build Windows EXE
 
 on:
-  push:
-    branches:
-      - main
+push:
+branches:
+- main
 
 jobs:
-  build:
+build:
 
-    runs-on: windows-latest
+```
+runs-on: windows-latest
 
-    steps:
+steps:
 
-      - name: Checkout
-        uses: actions/checkout@v4
+  - name: Checkout
+    uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
+  - name: Setup Java
+    uses: actions/setup-java@v4
+    with:
+      distribution: temurin
+      java-version: 17
 
-      - name: Build Jar
-        run: gradlew.bat clean build -x test
+  - name: Verify Project
+    run: |
+      dir
+      dir lib
 
-      - name: Create EXE
-        run: |
-          jpackage ^
-            --type app-image ^
-            --name FontTool ^
-            --input lib\build\libs ^
-            --main-jar font-tool-1.0.jar ^
-            --dest dist
+  - name: Build Jar
+    run: .\gradlew.bat clean build -x test
 
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: FontTool
-          path: dist
+  - name: Show Generated Jars
+    run: |
+      dir lib\build\libs
+
+  - name: Create EXE
+    shell: cmd
+    run: |
+      jpackage ^
+        --type app-image ^
+        --name FontTool ^
+        --input lib\build\libs ^
+        --main-jar font-tool-1.0.jar ^
+        --dest dist
+
+  - name: Upload Artifact
+    uses: actions/upload-artifact@v4
+    with:
+      name: FontTool
+      path: dist
+```
